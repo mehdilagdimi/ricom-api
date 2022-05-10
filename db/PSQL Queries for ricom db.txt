@@ -1,0 +1,78 @@
+-- CREATE DATABASE ricom;
+-- USE ricom
+-- GO
+
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL NOT NULL,
+    fName VARCHAR(30) NOT NULL,
+    lName VARCHAR(30) NOT NULL,
+    role VARCHAR(60) NOT NULL,
+    email VARCHAR(60) NOT NULL,
+    phone VARCHAR(30),
+    passw VARCHAR(255) NOT NULL,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS patient (
+    birthDate DATE,
+    id_p SERIAL NOT NULL UNIQUE
+) INHERITS (users);
+
+
+CREATE TABLE IF NOT EXISTS serie(
+    id SERIAL NOT NULL,
+    name VARCHAR(150),
+   modality_id INT,
+    patient_id INT,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (patient_id) REFERENCES patient(id_p) ON DELETE CASCADE,
+ FOREIGN KEY (modality_id) REFERENCES patient(id_p) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS modality(
+	id SERIAL NOT NULL,
+    modality VARCHAR(30),
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS dicomSlice(
+	id SERIAL NOT NULL,
+    serie_id INT,
+    name VARCHAR(150),
+    annotation jsonb,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (serie_id) REFERENCES serie(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS examinationOrder (
+	id SERIAL NOT NULL,
+    physician_id INT,
+    radiologist_id INT,
+    physician_order VARCHAR(500),
+    status VARCHAR(30),
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (physician_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (radiologist_id) REFERENCES users(id) ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS report (
+	id SERIAL NOT NULL,
+    serie_id INT,
+    order_id INT,
+    physician_id INT,
+    radiologist_id INT,
+    reportRadiologist TEXT,
+    reportPhysician TEXT,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (order_id) REFERENCES examinationOrder(id) ON UPDATE CASCADE,
+    FOREIGN KEY (serie_id) REFERENCES serie(id) ON DELETE CASCADE, 
+    FOREIGN KEY (physician_id) REFERENCES users(id) ON UPDATE CASCADE,
+    FOREIGN KEY (radiologist_id) REFERENCES users(id) ON UPDATE CASCADE
+);
+
