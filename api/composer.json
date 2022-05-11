@@ -1,0 +1,15 @@
+{
+    "name": "mehdilagdimirda/ricomapi",
+    "description": "RICOM",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mehdi LAGDIMI"
+        }
+    ],
+    "require": {
+        "firebase/php-jwt": "^6.1",
+        "vlucas/phpdotenv": "^5.4"
+    }
+}
