@@ -38,7 +38,7 @@
             $this->passw = htmlspecialchars(strip_tags($passw));
             
             //check is user already exists
-            $this->getUser($this->userRef, $this->fName, $this->lName, $this->bDate, $this->passw );
+            $this->getUser($this->userRef, $this->fName, $this->lName, $this->bDate, $this->passw);
             if($this->db->rowCount() > 0) {
                 // echo json_encode(array("msg" => "User already exists", "userRef" => $this->userRef));
                 // return false;
@@ -48,12 +48,7 @@
             $this->db->query("INSERT INTO $this->table (userRef, fName, lName, birthDate, passw) VALUES (:userRef, :fName, :lName, :birthDate, :passw)
                ON CONFLICT (userRef) DO NOTHING
                 ");
-                //  UPDATE 
-                //  SET userRef = :userRef
-                //  WHERE NOT EXISTS (SELECT 1 FROM $this->table WHERE userRef = :Ref)
-            // IF NOT FOUND THEN 
-            //     RAISE 'Can't add this user', :userRef;
-            // END IF;
+               
 
             $this->db->bind(':userRef', $this->userRef);
             // $this->db->bind(':Ref', $userRef);
@@ -73,9 +68,9 @@
 
         public function getUser(){
 
-                $this->db->query("SELECT * FROM $this->table WHERE userRef=:userRef");
+                $this->db->query("SELECT * FROM $this->table WHERE email=:email");
                 $this->db->bind(':userRef', $this->userRef);
-                $result = $this->db->resultSet();
+                $result = $this->db->single();
                 return $result;
         }
  
