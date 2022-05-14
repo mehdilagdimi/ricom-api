@@ -16,13 +16,12 @@ class JWTGenerate
     public $issuedAt;
     public $expire;
 
-    public function __construct($serverName = "localhost/ricom api/api", $user_id, $role)
+    public function __construct($serverName = "localhost/ricom api/api", $role)
     {
         $this->secret = strval(getenv('SECRET'));
         $this->issuedAt   = new DateTimeImmutable();
         $this->expire     = $this->issuedAt->modify('+6 minutes')->getTimestamp();      // Add 60 seconds
         $this->serverName = $serverName;
-        $this->user_id = $user_id;
         $this->role = $role;
     }
 
@@ -41,10 +40,29 @@ class JWTGenerate
         return JWT::encode($this->payload, $this->secret, 'HS512');
     }
 
-    function validate()
+    private static function getToken(){
+        $bearerToken = "null";
+        if (isset($_SERVER['AUTHORIZATION'])) {
+            echo "1";
+            $bearerToken = $_SERVER['AUTHORIZATION'];
+        }elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) { //Nginx or fast CGI
+            echo "2";
+            $bearerToken = $_SERVER["HTTP_AUTHORIZATION"];
+        }elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+            echo "3";
+           $bearerToken = $_SERVER["REDIRECT_HTTP_AUTHORIZATION"];
+        }
+        // echo $bearerToken;
+        // die();
+       return $bearerToken;  
+    }
+
+    public static function validate($role)
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!preg_match('/Bearer\s(\S+)/', $_SERVER['HTTP_AUTHORIZATION'], $matches)) {
+        $bearerToken = JWTGenerate::getToken();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' ||$_SERVER['REQUEST_METHOD'] === 'GET' || $_SERVER['REQUEST_METHOD'] === 'UPDATE') {
+            if (!preg_match('/Bearer\s(\S+)/', $bearerToken, $matches)) {
                 header('HTTP/1.0 400 Bad Request');
                 echo 'Token not found in request';
                 exit;
@@ -63,8 +81,7 @@ class JWTGenerate
             $serverName = "localhost/ricom api/api";
 
             if (
-                $token->user_id !== $this->user_id ||
-                $token->role !== $this->role ||
+                $token->role !== $role ||
                 $token->iss !== $serverName ||
                 $token->nbf > $now->getTimestamp() ||
                 $token->exp < $now->getTimestamp()

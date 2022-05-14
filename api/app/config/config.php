@@ -11,7 +11,7 @@
     //app root
     define('APPROOT', dirname(dirname(__FILE__)));
     //url root
-    define('URLROOT', 'http://localhost/ricom api/api/');
+    define('URLROOT', 'http://localhost/RICOM api/api/');
     //css root
     // define ('CSSROOT', dirname(dirname(dirname(__FILE__))) . '\public\css');
     //img src root

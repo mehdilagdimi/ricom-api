@@ -1,13 +1,13 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
-header("Access-Control-Allow-Methods: GET, POST");
-header("Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With");
+// header("Access-Control-Allow-Origin: *");
+// header("Content-Type: application/json");
+// header("Access-Control-Allow-Methods: GET, POST, UPDATE");
+// header("Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With");
 
 
-require_once('vendor/autoload.php');
-require '../generate_jwt.php';
-
+// require_once '../vendor/autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+require_once dirname(__DIR__) .'/generate_jwt.php';
 
 function hashFunction($algo, $data)
 {
@@ -20,7 +20,6 @@ class Authenticate extends Controller
     private $username;
     private $passw;
     public $loggedin;
-    public $user_id;
     public $role;
     public $jwt;
     public $token;
@@ -34,15 +33,14 @@ class Authenticate extends Controller
     {
         $data = json_decode(file_get_contents("php://input"));
         if ($data) {
-            $this->login($data);
-
-            if (isset($_SESSION['loggedIn'])) {
-                if ($_SESSION['loggedIn']) {
+            if($this->login($data)){
+                if($this->token){
+                    echo json_encode($this->token);
                 }
             } else {
-                header("location:" . URLROOT . "users/index");
+                echo json_encode("Invalid credentials");
             }
-        } else {
+            
             echo json_encode("Failed to receive login credentials");
         }
     }
@@ -60,25 +58,26 @@ class Authenticate extends Controller
         $result = $this->userModel->getUser($this->email, $this->passw);
         
         if ($result) {
-            $this->user_id = $result->id;
             $this->role = $result->role;
             $this->generate_jwt();
+            return true;
         } else {
-            echo json_decode("Invalid credentials");
+            return false;
         }
     }
 
     public function generate_jwt()
     {
-            $this->jwt = new JWTGenerate("localhost/ricom api/api", $this->user_id, $this->role);
+            $this->jwt = new JWTGenerate("localhost/ricom api/api", $this->role);
             $this->token = $this->jwt->generate();
     }
 
-    public function validate_jwt()
+    public function validate_jwt($role)
     {
-        if ($this->jwt->validate()) {
+        if (JWTGenerate::validate($role)) {
             echo "success";
-            header("location:" . URLROOT . "$this->role/index");
+            return true;
+            // header("location:" . URLROOT . "$this->role/index");
         };
     }
 }
