@@ -6,7 +6,10 @@ require 'bootstrap.php';
 require 'vendor/autoload.php';
 
 use Firebase\JWT\JWT;
-
+use Firebase\JWT\Key;
+use Firebase\JWT\ExpiredException;
+$jwt = new JWTGenerate("localhost/ricom api/api", "admin");
+echo $jwt->generate();
 // get the local secret key
 class JWTGenerate
 {
@@ -18,9 +21,9 @@ class JWTGenerate
 
     public function __construct($serverName = "localhost/ricom api/api", $role)
     {
-        $this->secret = strval(getenv('SECRET'));
+        $this->secret = $_ENV["SECRET"];
         $this->issuedAt   = new DateTimeImmutable();
-        $this->expire     = $this->issuedAt->modify('+6 minutes')->getTimestamp();      // Add 60 seconds
+        $this->expire     = $this->issuedAt->modify('+60 minutes')->getTimestamp();      // Add 60 seconds
         $this->serverName = $serverName;
         $this->role = $role;
     }
@@ -29,7 +32,6 @@ class JWTGenerate
     public function generate()
     {
         $this->payload = [
-            'user_id' => $this->user_id,
             'role' => $this->role,
             'iat'  => $this->issuedAt->getTimestamp(),         // Issued at: time when the token was generated
             'iss'  => $this->serverName,                       // Issuer
@@ -40,28 +42,31 @@ class JWTGenerate
         return JWT::encode($this->payload, $this->secret, 'HS512');
     }
 
-    private static function getToken(){
+    private static function getToken()
+    {
         $bearerToken = "null";
         if (isset($_SERVER['AUTHORIZATION'])) {
-            echo "1";
+            // echo "1";
             $bearerToken = $_SERVER['AUTHORIZATION'];
-        }elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) { //Nginx or fast CGI
-            echo "2";
+        } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) { //Nginx or fast CGI
+            // echo "2";
             $bearerToken = $_SERVER["HTTP_AUTHORIZATION"];
-        }elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-            echo "3";
-           $bearerToken = $_SERVER["REDIRECT_HTTP_AUTHORIZATION"];
+        } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+            // echo "3";
+            $bearerToken = $_SERVER["REDIRECT_HTTP_AUTHORIZATION"];
         }
         // echo $bearerToken;
         // die();
-       return $bearerToken;  
+        return $bearerToken;
     }
 
     public static function validate($role)
     {
         $bearerToken = JWTGenerate::getToken();
+        // echo "<br> TOKEN " . $bearerToken;
+        // die();
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' ||$_SERVER['REQUEST_METHOD'] === 'GET' || $_SERVER['REQUEST_METHOD'] === 'UPDATE') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'GET' || $_SERVER['REQUEST_METHOD'] === 'UPDATE') {
             if (!preg_match('/Bearer\s(\S+)/', $bearerToken, $matches)) {
                 header('HTTP/1.0 400 Bad Request');
                 echo 'Token not found in request';
@@ -74,9 +79,19 @@ class JWTGenerate
                 header('HTTP/1.0 400 Bad Request');
                 exit;
             }
+            // echo $jwt;
+            // die();
+            // $secret = $_ENV['SECRET'];
+            $secret = '8d475c824f25a2555c320f4064954cc8bb9432101af6c5a59490081b8edf2942';
 
-            $secret = strval(getenv('SECRET'));
-            $token = JWT::decode($jwt, $secret, ['HS512']);
+            try {
+                $token = JWT::decode($jwt, new Key($secret, 'HS512'));
+            } catch (ExpiredException $e) {
+                echo "Expired Token";
+                echo "Please sign-in";
+            }
+            // echo $token;
+            // die();
             $now = new DateTimeImmutable();
             $serverName = "localhost/ricom api/api";
 
@@ -88,7 +103,7 @@ class JWTGenerate
             ) {
                 header('HTTP/1.1 401 Unauthorized');
                 exit;
-            } else { 
+            } else {
                 return true;
             }
         }
