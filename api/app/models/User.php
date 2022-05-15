@@ -31,21 +31,27 @@
             if($this->getUser()){
                 return false;
             };
-
-            if($this->bDate !== null){
-                $this->db->query("INSERT INTO $this->table (fName, lName, [role], email, phone, birthDate, passw) VALUES (:fName, :lName, :[role], :email, :phone, :birthDate, :passw)");
-                // --    ON CONFLICT (userRef) DO NOTHING");
+            
+            if($bDate !== null){
+                $this->table = "patient";
+                $this->db->query('INSERT INTO ' . $this->table . ' (fName, lName, "role", email, phone, birthDate, passw) VALUES (:fName, :lName, :rle, :email, :phone, :birthDate, :passw)');
                 $this->db->bind(':birthDate', $this->bDate);
+                $this->table = "users";
             } else {
-                $this->db->query("INSERT INTO $this->table (fName, lName, [role], email, phone, passw) VALUES (:fName, :lName, :[role], :email, :phone, :passw)");
+                $this->db->query('INSERT INTO '  .$this->table . ' (fname, lname, "role", email, phone, passw) VALUES (:fName, :lName, :rle, :email, :phone, :passw)');
             }
                
-            $this->db->bind(':role', $this->role);
-            $this->db->bind(':email', $this->email);
-            $this->db->bind(':phone', $this->phone);
+          
             $this->db->bind(':fName', $this->fName);
             $this->db->bind(':lName', $this->lName);
+            $this->db->bind(':rle', $this->role);
+            $this->db->bind(':email', $this->email);
+            $this->db->bind(':phone', $this->phone);
+    
             $this->db->bind(':passw', $this->passw);
+
+            // echo "success bind";
+            // die();
 
             if($this->db->execute()){
                 return 1;

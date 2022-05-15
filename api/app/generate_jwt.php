@@ -8,8 +8,8 @@ require 'vendor/autoload.php';
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\ExpiredException;
-$jwt = new JWTGenerate("localhost/ricom api/api", "admin");
-echo $jwt->generate();
+// $jwt = new JWTGenerate("localhost/ricom api/api", "admin");
+// echo $jwt->generate();
 // get the local secret key
 class JWTGenerate
 {
@@ -81,14 +81,14 @@ class JWTGenerate
             }
             // echo $jwt;
             // die();
-            // $secret = $_ENV['SECRET'];
-            $secret = '8d475c824f25a2555c320f4064954cc8bb9432101af6c5a59490081b8edf2942';
+            $secret = $_ENV['SECRET'];
 
             try {
                 $token = JWT::decode($jwt, new Key($secret, 'HS512'));
             } catch (ExpiredException $e) {
-                echo "Expired Token";
+                echo "Expired Token ";
                 echo "Please sign-in";
+                exit;
             }
             // echo $token;
             // die();
