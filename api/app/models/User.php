@@ -28,7 +28,7 @@
             $this->passw = htmlspecialchars(strip_tags($passw));
             
             //check is user already exists
-            if($this->getUser()){
+            if($this->getUser($this->email, $this->passw)){
                 return false;
             };
             
@@ -60,10 +60,11 @@
             }
         }
 
-        public function getUser(){
-                $this->db->query("SELECT * FROM $this->table WHERE email=:email");
-                $this->db->bind(':email', $this->email);
-                $result = $this->db->single();
+        public function getUser($email, $passw){
+                $this->db->query("SELECT * FROM $this->table WHERE email=:email AND passw =:passw");
+                $this->db->bind(':email', $email);
+                $this->db->bind(':passw', $passw);
+               $result = $this->db->single();
                 return $result;
         }
  

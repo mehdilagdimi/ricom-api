@@ -32,15 +32,18 @@ class Authenticate extends Controller
     public function index()
     {
         $data = json_decode(file_get_contents("php://input"));
+        // echo $data->passw; 
+        // die();
         if ($data) {
             if($this->login($data)){
                 if($this->token){
-                    echo json_encode($this->token);
+                    echo json_encode("Access allowed : $this->token");
                 }
             } else {
                 echo json_encode("Invalid credentials");
             }
             
+        } else {
             echo json_encode("Failed to receive login credentials");
         }
     }
@@ -56,7 +59,7 @@ class Authenticate extends Controller
         $this->passw = hashFunction('sha256', $this->passw);
 
         $result = $this->userModel->getUser($this->email, $this->passw);
-        
+    
         if ($result) {
             $this->role = $result->role;
             $this->generate_jwt();
