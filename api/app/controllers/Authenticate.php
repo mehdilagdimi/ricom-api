@@ -1,8 +1,9 @@
 <?php
-// header("Access-Control-Allow-Origin: *");
-// header("Content-Type: application/json");
-// header("Access-Control-Allow-Methods: GET, POST, UPDATE");
-// header("Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With");
+header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Content-Type: application/json");
+header('Access-Control-Allow-Credentials: true');
+header("Access-Control-Allow-Methods: GET, POST, UPDATE");
+header("Access-Control-Allow-Headers: Access-Control-Allow-Headers, Access-Control-Allow-Credentials, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With");
 
 
 // require_once '../vendor/autoload.php';
@@ -35,12 +36,21 @@ class Authenticate extends Controller
         // echo $data->passw; 
         // die();
         if ($data) {
+            // echo json_encode($data);
+            // exit();
             if($this->login($data)){
                 if($this->token){
-                    echo json_encode("Access allowed : $this->token");
+                    // setCookie($name="token", $value=$this->token, $httponly=true);
+                    $cookie = setcookie("jwt",$this->token,0,'/','',false,true);
+                    // header("Set-Cookie: samesite-test=1; expires=0; path=/; samesite=Strict");
+                    if($cookie){
+                        echo json_encode(["response" => "Access allowed", "jwt" => $this->token, "cookie state" => $cookie,"cookies"=>$_COOKIE]);
+                    }else {
+                        echo json_encode(["response" => "Failed to set cookie"]);
+                    }
                 }
             } else {
-                echo json_encode("Invalid credentials");
+                echo json_encode(["response" => "Invalid credentials"]);
             }
             
         } else {
@@ -82,5 +92,11 @@ class Authenticate extends Controller
             return true;
             // header("location:" . URLROOT . "$this->role/index");
         };
+    }
+
+    public function testcookie($data){
+        if($data){
+            echo json_encode(["response" => $_COOKIE, "tst" => $data]);
+        }
     }
 }

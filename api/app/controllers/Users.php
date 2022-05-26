@@ -35,6 +35,7 @@ class Users extends Controller
     public function signup()
     {
         $auth = new Authenticate();
+        //Creating new user is done only by admin
         if ($auth->validate_jwt("admin")) {
             $data = json_decode(file_get_contents("php://input"));
 
@@ -68,6 +69,32 @@ class Users extends Controller
             echo json_encode("Access denied");
         }
     }
+
+    // public function login()
+    // {
+    //     $data = json_decode(file_get_contents("php://input"));
+    //     if($data){
+    //         $this->email = $data->email;
+    //         $this->passw = $data->passw;
+    //         $this->passw = hashFunction('sha256', $this->passw);
+    
+    //         $user = $this->userModel->getUser($this->email, $this->passw);
+    
+    //         //validate jwtoken
+    //         $auth = new Authenticate();
+    //         if ($auth->validate_jwt($user->role)) {
+    //             if($user->role !== "admin"){
+    //                 die("success");
+    //                 header("location:" . URLROOT . ucfirst($user->role) . 's');
+    //             }
+    //         }
+    //     } else {
+    //         echo "No data was sent";
+    //         exit();
+    //     }
+     
+    // }
+
 
     public function deleteUser()
     {

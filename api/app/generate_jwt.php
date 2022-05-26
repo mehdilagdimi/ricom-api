@@ -8,9 +8,12 @@ require 'vendor/autoload.php';
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\ExpiredException;
+
 // $jwt = new JWTGenerate("localhost/ricom api/api", "admin");
 // echo $jwt->generate();
+
 // get the local secret key
+
 class JWTGenerate
 {
     private $secret;
@@ -23,7 +26,7 @@ class JWTGenerate
     {
         $this->secret = $_ENV["SECRET"];
         $this->issuedAt   = new DateTimeImmutable();
-        $this->expire     = $this->issuedAt->modify('+60 minutes')->getTimestamp();      // Add 60 seconds
+        $this->expire     = $this->issuedAt->modify('+60 minutes')->getTimestamp();      // Add 60 mins
         $this->serverName = $serverName;
         $this->role = $role;
     }
@@ -35,16 +38,17 @@ class JWTGenerate
             'role' => $this->role,
             'iat'  => $this->issuedAt->getTimestamp(),         // Issued at: time when the token was generated
             'iss'  => $this->serverName,                       // Issuer
-            'nbf'  => $this->issuedAt->getTimestamp(),         // Not before
+            'nbf'  => $this->issuedAt->modify('+20 minutes')->getTimestamp(),         // Not before
             'exp'  => $this->expire,                           // Expire
         ];
-
+        // echo $_ENV["SECRET"];
+        // exit();
         return JWT::encode($this->payload, $this->secret, 'HS512');
     }
 
     private static function getToken()
     {
-        $bearerToken = "null";
+        $bearerToken = null;
         if (isset($_SERVER['AUTHORIZATION'])) {
             // echo "1";
             $bearerToken = $_SERVER['AUTHORIZATION'];
@@ -62,7 +66,10 @@ class JWTGenerate
 
     public static function validate($role)
     {
-        $bearerToken = JWTGenerate::getToken();
+        if(!$bearerToken = JWTGenerate::getToken()){
+            echo "Token not found";
+            exit();
+        };
         // echo "<br> TOKEN " . $bearerToken;
         // die();
 

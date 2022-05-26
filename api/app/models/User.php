@@ -40,7 +40,20 @@
             } else {
                 $this->db->query('INSERT INTO '  .$this->table . ' (fname, lname, "role", email, phone, passw) VALUES (:fName, :lName, :rle, :email, :phone, :passw)');
             }
-               
+
+            // Reserved PSQL keyword inside a single quoted query in PHP : 
+            $this->db->query('INSERT INTO ' . $this->table . ' (fName, "role") VALUES (:fName, :rle)');
+
+            // Reserved PSQL keyword inside a single quoted query in PHP :
+                # In postgreSQL column names are converted to lowercase so case doesn't matter 
+                # Though reserved word 'role' is interpreted the way it is written (case sensitive)
+                # PHP var can't be recognised inside single quotes       
+            $this->db->query('INSERT INTO ' . $this->table . ' (fName, "role") VALUES (:fName, :rle)');
+
+            // Reserved PSQL keyword inside a double quoted query : PHP var is recognised inside quotes
+            $this->db->query("INSERT INTO  $this->table  (fName, roole) VALUES (:fName, :roole)");
+    
+            
           
             $this->db->bind(':fName', $this->fName);
             $this->db->bind(':lName', $this->lName);
