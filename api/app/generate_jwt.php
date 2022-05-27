@@ -38,49 +38,67 @@ class JWTGenerate
             'role' => $this->role,
             'iat'  => $this->issuedAt->getTimestamp(),         // Issued at: time when the token was generated
             'iss'  => $this->serverName,                       // Issuer
-            'nbf'  => $this->issuedAt->modify('+20 minutes')->getTimestamp(),         // Not before
+            // 'nbf'  => $this->issuedAt->modify('+20 minutes')->getTimestamp(),         // Not before
+            'nbf'  => $this->issuedAt->getTimestamp(),         // Not before
             'exp'  => $this->expire,                           // Expire
         ];
         // echo $_ENV["SECRET"];
         // exit();
+        // JWT::$leeway += 60;
         return JWT::encode($this->payload, $this->secret, 'HS512');
     }
 
     private static function getToken()
     {
-        $bearerToken = null;
-        if (isset($_SERVER['AUTHORIZATION'])) {
-            // echo "1";
-            $bearerToken = $_SERVER['AUTHORIZATION'];
-        } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) { //Nginx or fast CGI
-            // echo "2";
-            $bearerToken = $_SERVER["HTTP_AUTHORIZATION"];
-        } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-            // echo "3";
-            $bearerToken = $_SERVER["REDIRECT_HTTP_AUTHORIZATION"];
-        }
-        // echo $bearerToken;
-        // die();
-        return $bearerToken;
+        // $bearerToken = null;
+        // if (isset($_SERVER['AUTHORIZATION'])) {
+        //     // echo "1";
+        //     $bearerToken = $_SERVER['AUTHORIZATION'];
+        // } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) { //Nginx or fast CGI
+        //     // echo "2";
+        //     $bearerToken = $_SERVER["HTTP_AUTHORIZATION"];
+        // } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        //     // echo "3";
+        //     $bearerToken = $_SERVER["REDIRECT_HTTP_AUTHORIZATION"];
+        // }
+        // // echo $bearerToken;
+        // // die();
+        // return $bearerToken;
+        if(isset($_COOKIE["jwt"])){
+            if($_COOKIE["jwt"] === "" || $_COOKIE["jwt"] === null || $_COOKIE["jwt"] === 0 || $_COOKIE["jwt"] === false){
+                // echo $_COOKIE["jwt"];
+                echo 'Login to authenticate';
+                exit;
+            } else {
+                // echo $_COOKIE["jwt"];
+                return $_COOKIE["jwt"];
+            }
+            
+        } else {
+            header('HTTP/1.0 400 Bad Request');
+            echo 'Token not found in request';
+            exit;
+        }  
     }
 
     public static function validate($role)
     {
-        if(!$bearerToken = JWTGenerate::getToken()){
+        if(!$tokenInCookie = JWTGenerate::getToken()){
             echo "Token not found";
             exit();
         };
-        // echo "<br> TOKEN " . $bearerToken;
+        // echo "<br> TOKEN " . $token;
         // die();
-
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'GET' || $_SERVER['REQUEST_METHOD'] === 'UPDATE') {
-            if (!preg_match('/Bearer\s(\S+)/', $bearerToken, $matches)) {
-                header('HTTP/1.0 400 Bad Request');
-                echo 'Token not found in request';
-                exit;
-            }
-
-            $jwt = $matches[1];
+            // if (!preg_match('/Bearer\s(\S+)/', $token, $matches)) {
+            //     header('HTTP/1.0 400 Bad Request');
+            //     echo 'Token not found in request';
+            //     exit;
+            // }
+            
+            // $jwt = $matches[1];
+            $jwt = $tokenInCookie;
             if (!$jwt) {
                 // No token was able to be extracted from the authorization header
                 header('HTTP/1.0 400 Bad Request');
@@ -92,7 +110,10 @@ class JWTGenerate
 
             try {
                 $token = JWT::decode($jwt, new Key($secret, 'HS512'));
+                //  echo strval($token->role);
+                // die();
             } catch (ExpiredException $e) {
+                echo "token :" . $jwt . "<br>";
                 echo "Expired Token ";
                 echo "Please sign-in";
                 exit;

@@ -33,18 +33,14 @@ class Authenticate extends Controller
     public function index()
     {
         $data = json_decode(file_get_contents("php://input"));
-        // echo $data->passw; 
-        // die();
         if ($data) {
-            // echo json_encode($data);
-            // exit();
             if($this->login($data)){
                 if($this->token){
                     // setCookie($name="token", $value=$this->token, $httponly=true);
                     $cookie = setcookie("jwt",$this->token,0,'/','',false,true);
                     // header("Set-Cookie: samesite-test=1; expires=0; path=/; samesite=Strict");
                     if($cookie){
-                        echo json_encode(["response" => "Access allowed", "jwt" => $this->token, "cookie state" => $cookie,"cookies"=>$_COOKIE]);
+                        echo json_encode(["response" => "Access allowed", "jwt" => $this->token, "cookie state" => $cookie]);
                     }else {
                         echo json_encode(["response" => "Failed to set cookie"]);
                     }
@@ -52,7 +48,6 @@ class Authenticate extends Controller
             } else {
                 echo json_encode(["response" => "Invalid credentials"]);
             }
-            
         } else {
             echo json_encode("Failed to receive login credentials");
         }
@@ -72,6 +67,10 @@ class Authenticate extends Controller
     
         if ($result) {
             $this->role = $result->role;
+            if(isset($_COOKIE["jwt"])){
+                setcookie('jwt', '', time()-3600);
+                unset($_COOKIE["jwt"]);
+            }
             $this->generate_jwt();
             return true;
         } else {
@@ -87,11 +86,18 @@ class Authenticate extends Controller
 
     public function validate_jwt($role)
     {
+        // echo json_encode($role);
+        // die();
+        $role = strtoupper($role);
+
         if (JWTGenerate::validate($role)) {
-            echo "success";
+            echo json_encode(["response" => "Successfully authenticated"]);
             return true;
             // header("location:" . URLROOT . "$this->role/index");
-        };
+        }else {
+            echo json_encode(["response" => "Failed authentication"]);
+            return true;
+        }
     }
 
     public function testcookie($data){
