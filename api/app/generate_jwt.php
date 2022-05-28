@@ -102,6 +102,7 @@ class JWTGenerate
             if (!$jwt) {
                 // No token was able to be extracted from the authorization header
                 header('HTTP/1.0 400 Bad Request');
+                // return false;
                 exit;
             }
             // echo $jwt;
@@ -113,9 +114,9 @@ class JWTGenerate
                 //  echo strval($token->role);
                 // die();
             } catch (ExpiredException $e) {
-                echo "token :" . $jwt . "<br>";
                 echo "Expired Token ";
                 echo "Please sign-in";
+                // return false;
                 exit;
             }
             // echo $token;
@@ -130,6 +131,7 @@ class JWTGenerate
                 $token->exp < $now->getTimestamp()
             ) {
                 header('HTTP/1.1 401 Unauthorized');
+                // return false;
                 exit;
             } else {
                 return true;

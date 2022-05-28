@@ -96,10 +96,23 @@ class Authenticate extends Controller
             // header("location:" . URLROOT . "$this->role/index");
         }else {
             echo json_encode(["response" => "Failed authentication"]);
-            return true;
+            return false;
         }
     }
 
+    public function logout(){
+        if(isset($_COOKIE["jwt"])){
+            setcookie("jwt", $this->token , time() - 3600 ,'/','',false,true);
+            unset($_COOKIE["jwt"]);
+            unset($_COOKIE);
+            echo json_encode("logged out succesfully");
+            // header("Location: ".$_SERVER['REQUEST_URI']);
+            exit;
+        } else {
+            echo json_encode("Failed to logout");
+            exit;
+        }
+    }
     public function testcookie($data){
         if($data){
             echo json_encode(["response" => $_COOKIE, "tst" => $data]);
