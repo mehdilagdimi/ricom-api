@@ -40,7 +40,7 @@ class Authenticate extends Controller
                     $cookie = setcookie("jwt",$this->token,0,'/','',false,true);
                     // header("Set-Cookie: samesite-test=1; expires=0; path=/; samesite=Strict");
                     if($cookie){
-                        echo json_encode(["response" => "Access allowed", "jwt" => $this->token, "cookie state" => $cookie]);
+                        echo json_encode(["response" => "Access allowed", "role" => $this->role, "cookie state" => $cookie]);
                     }else {
                         echo json_encode(["response" => "Failed to set cookie"]);
                     }
@@ -91,11 +91,11 @@ class Authenticate extends Controller
         $role = strtoupper($role);
 
         if (JWTGenerate::validate($role)) {
-            echo json_encode(["response" => "Successfully authenticated"]);
+            echo json_encode(["response" => "Successfully authenticated", "role" => $role]);
             return true;
             // header("location:" . URLROOT . "$this->role/index");
         }else {
-            echo json_encode(["response" => "Failed authentication"]);
+            echo json_encode(["response" => "Failed authentication", "role" => null]);
             return false;
         }
     }

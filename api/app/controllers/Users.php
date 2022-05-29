@@ -35,8 +35,9 @@ class Users extends Controller
     public function signup()
     {
         $auth = new Authenticate();
+       
         //Creating new user is done only by admin
-        if ($auth->validate_jwt("admin")) {
+        if ($auth->validate_jwt('admin')) {
             $data = json_decode(file_get_contents("php://input"));
 
             if ($data) {
