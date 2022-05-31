@@ -1,0 +1,82 @@
+<?php
+// header("Access-Control-Allow-Origin: *");
+// header("Content-Type: application/json");
+// header('Access-Control-Allow-Credentials: true');
+// header("Access-Control-Allow-Methods: GET, POST, UPDATE");
+// header("Access-Control-Allow-Headers: Access-Control-Allow-Headers, Access-Control-Allow-Credentials, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With");
+
+require 'Authenticate.php';
+
+class Orders extends Controller
+{
+    public $physician_id;
+    public $patient_id;
+    public $radiologist;
+    public $status;
+    private $order;
+    public $response;
+
+    public function __construct()
+    {
+        $this->orderModel = $this->model('Order');
+    }
+
+    //default method
+    public function index()
+    {
+    }
+
+    public function getOrder($order)
+    {
+        htmlspecialchars(strip_tags($order));
+        $this->orderModel->getSlot($order);
+    }
+
+    public function getOrders()
+    {
+    }
+    public function storeOrder()
+    {
+        $auth = new Authenticate();
+        $this->response = [];
+        //Creating new order only physicians
+        if ($auth->validate_jwt('physician', $this->response, false)) {
+            // $this->response['response'] = "Successfully authenticated";
+            // $this->response['role'] = "physician";
+            $data = json_decode(file_get_contents("php://input"));
+            // var_dump($data);
+            // die();
+            if ($data) {
+                $this->physician_id = $data->userID;
+                // die(var_dump($this->physician_id));
+                $this->patient_id = $data->patientID;
+                $this->order = $data->order;
+                $this->status = strtoupper("pending");
+
+                $result = $this->orderModel->addOrder($this->physician_id, $this->patient_id, $this->order, $this->status);                
+                if ($result === 1) {
+                    // $this->response['msg'] = "Order added successfully";
+                    // $this->response['order'] = $this->order;
+                    $this->response += ["msg" => "Order added successfully", "order" => $this->order];
+                    echo json_encode($this->response);
+                } else if ($result === -1) {
+                    // array_push($this->response, array("msg" => "Error creating order", "order" => $this->order));
+                    $this->response += ["msg" => "Error creating order", "order" => $this->order];
+                    echo json_encode($this->response);
+                } 
+                // else if (!$result) {
+                //     echo json_encode(array("msg" => "Order already exists", "email" => $this->email));
+                // }
+            } else {
+                echo json_encode("No data has been received from client");
+            }
+        } else {
+            echo json_encode("Access denied");
+        }
+    }
+
+
+    public function deleteOrders()
+    {
+    }
+}

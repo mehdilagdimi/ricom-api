@@ -19,6 +19,7 @@ class Authenticate extends Controller
 {
     private $email;
     private $username;
+    private $userID;
     private $passw;
     public $loggedin;
     public $role;
@@ -40,7 +41,7 @@ class Authenticate extends Controller
                     $cookie = setcookie("jwt",$this->token,0,'/','',false,true);
                     // header("Set-Cookie: samesite-test=1; expires=0; path=/; samesite=Strict");
                     if($cookie){
-                        echo json_encode(["response" => "Access allowed", "role" => $this->role, "cookie state" => $cookie]);
+                        echo json_encode(["response" => "Access allowed", "role" => $this->role, "userID" => $this->userID, "cookie state" => $cookie]);
                     }else {
                         echo json_encode(["response" => "Failed to set cookie"]);
                     }
@@ -67,6 +68,7 @@ class Authenticate extends Controller
     
         if ($result) {
             $this->role = $result->role;
+            $this->userID = $result->id;
             if(isset($_COOKIE["jwt"])){
                 setcookie('jwt', '', time()-3600);
                 unset($_COOKIE["jwt"]);
@@ -84,18 +86,25 @@ class Authenticate extends Controller
             $this->token = $this->jwt->generate();
     }
 
-    public function validate_jwt($role)
+    public function validate_jwt($role, &$response = [], $echoAuthState = true)
     {
-        // echo json_encode($role);
-        // die();
+       
         $role = strtoupper($role);
 
         if (JWTGenerate::validate($role)) {
-            echo json_encode(["response" => "Successfully authenticated", "role" => $role]);
+            $response += ["response" => "Successfully authenticated", "role" => $role];
+            if ($echoAuthState) {
+                echo json_encode($response);
+            }
+            // echo json_encode(["response" => "Successfully authenticated", "role" => $role]);
             return true;
             // header("location:" . URLROOT . "$this->role/index");
         }else {
-            echo json_encode(["response" => "Failed authentication", "role" => null]);
+            $response += ["response" => "Failed authentication", "role" => null];
+            if ($echoAuthState) {
+                echo json_encode($response);
+            }
+            // echo json_encode(["response" => "Failed authentication", "role" => null]);
             return false;
         }
     }

@@ -71,6 +71,17 @@ class Users extends Controller
         }
     }
 
+    public function getPatientById(){
+        $role = 'PATIENT';
+        $attrb = 'id_p';
+        $data = $this->userModel->getUsersByRole($role, $attrb);
+    
+        if($data){
+            echo json_encode(['response' => 'Records found', "patients_id" => $data]);
+        } else { 
+            echo json_encode(["response" => "No record was found"]);
+        }
+    }
     // public function login()
     // {
     //     $data = json_decode(file_get_contents("php://input"));
