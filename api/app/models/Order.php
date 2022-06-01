@@ -16,7 +16,10 @@
         }
         public function getOrdersByUserID($userID){
             $this->physician_id = htmlspecialchars($userID);
-            return $this->getSpecific("physician_id", $this->physician_id, "createdAt");
+            $this->table = 'physician_orders';
+            $res = $this->getSpecific("physician_id", $this->physician_id, "createdAt");
+            $this->table = 'examinationOrder';
+            return $res;
         }
 
         public function getSlot($slotID){
