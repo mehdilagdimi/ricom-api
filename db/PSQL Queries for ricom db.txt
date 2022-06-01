@@ -51,12 +51,14 @@ CREATE TABLE IF NOT EXISTS dicomSlice(
 CREATE TABLE IF NOT EXISTS examinationOrder (
 	id SERIAL NOT NULL,
     physician_id INT,
+    patient_id INT,
     radiologist_id INT,
     physician_order VARCHAR(500),
     status VARCHAR(30),
     createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     FOREIGN KEY (physician_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (patient_id) REFERENCES patient(id_p) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (radiologist_id) REFERENCES users(id) ON UPDATE CASCADE
 );
 
