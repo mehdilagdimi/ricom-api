@@ -11,8 +11,12 @@
 
         
 
-        public function getSlots(){
+        public function getOrders(){
             return $this->getTable();
+        }
+        public function getOrdersByUserID($userID){
+            $this->physician_id = htmlspecialchars($userID);
+            return $this->getSpecific("physician_id", $this->physician_id, "createdAt");
         }
 
         public function getSlot($slotID){

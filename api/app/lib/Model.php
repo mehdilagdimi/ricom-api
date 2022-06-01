@@ -16,13 +16,13 @@
             return $result;
         }
 
-        public function getTableOrder($userRef, $c, $orderBy){ 
-            $this->db->query("SELECT * FROM " . $this->table . " WHERE userRef=:userRef ORDER BY " . $c . " $orderBy");
-            //bind params
-            $this->db->bind(":userRef", $userRef);
-            $result = $this->db->resultSet();
-            return $result;
-        }
+        // public function getTableOrder($user, $userID, $c, $orderBy){ 
+        //     $this->db->query("SELECT * FROM " . $this->table . " WHERE $user=:userRef ORDER BY " . $c . " $orderBy");
+        //     //bind params
+        //     $this->db->bind(":$user", $userID);
+        //     $result = $this->db->resultSet();
+        //     return $result;
+        // }
 
         public function getSpecific($col, $constraint, $orderBy){
             $this->db->query("SELECT * FROM $this->table WHERE $col = :constrnt ORDER BY :ordrby DESC");

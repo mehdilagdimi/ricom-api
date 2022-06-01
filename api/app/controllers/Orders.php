@@ -28,13 +28,29 @@ class Orders extends Controller
 
     public function getOrder($order)
     {
-        htmlspecialchars(strip_tags($order));
-        $this->orderModel->getSlot($order);
+        // htmlspecialchars(strip_tags($order));
+        // $this->orderModel->getOrder($order);
     }
 
-    public function getOrders()
+    public function getOrders($userID)
     {
+        $auth = new Authenticate();
+        $this->response = [];
+        if ($auth->validate_jwt('physician', $this->response, false)) {
+            // $data = json_decode(file_get_contents("php://input"));
+           if($result = $this->orderModel->getOrdersByUserID($userID)){
+            $this->response += ["msg" => "Fetched Orders successfully", "data" => $result, "userID" => $userID];
+            echo json_encode($this->response);
+            exit;
+           } else {
+            $this->response += ["msg" => "Failed Fetching Orders successfully", "userID" => $userID];
+            echo json_encode($this->response);
+            exit;
+           };
+           
+        }
     }
+
     public function storeOrder()
     {
         $auth = new Authenticate();
