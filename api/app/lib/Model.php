@@ -24,6 +24,17 @@
         //     return $result;
         // }
 
+        public function getSpecificLimited($col, $constraint, $orderBy, $limit, $offset){
+            $this->db->query("SELECT * FROM $this->table WHERE $col = :constrnt ORDER BY :ordrby DESC LIMIT :lmt OFFSET :ofst");
+            $this->db->bind(":constrnt",$constraint);
+            $this->db->bind(":ordrby", $orderBy);
+            $this->db->bind(":lmt", $limit);
+            $this->db->bind(":ofst", $offset);
+            
+            $result = $this->db->resultSet();
+            return $result;
+        }
+
         public function getSpecific($col, $constraint, $orderBy){
             $this->db->query("SELECT * FROM $this->table WHERE $col = :constrnt ORDER BY :ordrby DESC");
             $this->db->bind(":constrnt",$constraint);

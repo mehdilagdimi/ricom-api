@@ -32,22 +32,27 @@ class Orders extends Controller
         // $this->orderModel->getOrder($order);
     }
 
-    public function getOrders($userID)
+    public function getOrders($userID, $currentPage, $limit)
     {
+        $offset = intval($currentPage) * intval($limit);
         $auth = new Authenticate();
         $this->response = [];
         if ($auth->validate_jwt('physician', $this->response, false)) {
             // $data = json_decode(file_get_contents("php://input"));
-           if($result = $this->orderModel->getOrdersByUserID($userID)){
-            $this->response += ["msg" => "Fetched Orders successfully", "data" => $result, "userID" => $userID];
-            echo json_encode($this->response);
-            exit;
-           } else {
-            $this->response += ["msg" => "Failed Fetching Orders successfully", "userID" => $userID];
-            echo json_encode($this->response);
-            exit;
-           };
-           
+            list($result, $count) = $this->orderModel->getOrdersByUserID($userID, $limit, $offset);
+            
+            // die(var_dump($result));
+
+            if ($result) {
+                $this->response += ["msg" => "Fetched Orders successfully", "data" => $result, "recordsTotal" => $count, "userID" => $userID];
+                // die(var_dump($this->response));
+                echo json_encode($this->response);
+                exit;
+            } else {
+                $this->response += ["msg" => "Failed Fetching Orders successfully", "userID" => $userID];
+                echo json_encode($this->response);
+                exit;
+            };
         }
     }
 
@@ -69,7 +74,7 @@ class Orders extends Controller
                 $this->order = $data->order;
                 $this->status = strtoupper("pending");
 
-                $result = $this->orderModel->addOrder($this->physician_id, $this->patient_id, $this->order, $this->status);                
+                $result = $this->orderModel->addOrder($this->physician_id, $this->patient_id, $this->order, $this->status);
                 if ($result === 1) {
                     // $this->response['msg'] = "Order added successfully";
                     // $this->response['order'] = $this->order;
@@ -79,7 +84,7 @@ class Orders extends Controller
                     // array_push($this->response, array("msg" => "Error creating order", "order" => $this->order));
                     $this->response += ["msg" => "Error creating order", "order" => $this->order];
                     echo json_encode($this->response);
-                } 
+                }
                 // else if (!$result) {
                 //     echo json_encode(array("msg" => "Order already exists", "email" => $this->email));
                 // }

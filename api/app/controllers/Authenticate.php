@@ -123,6 +123,9 @@ class Authenticate extends Controller
         }
     }
     public function testcookie($data){
+        // echo $par;
+        // echo $data[1];
+       
         if($data){
             echo json_encode(["response" => $_COOKIE, "tst" => $data]);
         }

@@ -14,14 +14,30 @@
         public function getOrders(){
             return $this->getTable();
         }
-        public function getOrdersByUserID($userID){
+    
+        public function getOrdersByUserID($userID, $limit, $offset){
             $this->physician_id = htmlspecialchars($userID);
             $this->table = 'physician_orders';
-            $res = $this->getSpecific("physician_id", $this->physician_id, "createdAt");
+            $res = $this->getSpecificLimited("physician_id", $this->physician_id, "createdAt", $limit, $offset);
+            $count = $this->getOrdersCount()->count;
+            // die(var_dump($this->getOrdersCount()->count));
             $this->table = 'examinationOrder';
-            return $res;
+            return array($res, $count);
         }
+        public function getOrdersCount(){
+            // $this->table = 'physician_orders';
+            $this->db->query("SELECT count(*) FROM $this->table");
+            //much faster query (estimate)
+            // $this->db->query("SELECT reltuples AS estimate FROM pg_class WHERE relname = $this->table");
 
+            $res = $this->db->single();            
+            if ($res) {
+                return $res;
+            } else {
+                return false;
+            }
+        }
+        
         public function getSlot($slotID){
             // $this->slotID =  $slotID;
 
