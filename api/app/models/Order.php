@@ -14,11 +14,22 @@
         public function getOrders(){
             return $this->getTable();
         }
+        public function getOrdersLimited($limit, $offset){
+            $limit = htmlspecialchars($limit);
+            $offset = htmlspecialchars($offset);
+            $this->table = 'physician_orders';
+            $res = $this->getSpecificLimited(null, null, "createdat", $limit, $offset);
+            $count = $this->getOrdersCount()->count;
+            $this->table = 'examinationOrder';
+            return array($res, $count);
+        }
     
         public function getOrdersByUserID($userID, $limit, $offset){
             $this->physician_id = htmlspecialchars($userID);
+            $limit = htmlspecialchars($limit);
+            $offset = htmlspecialchars($offset);
             $this->table = 'physician_orders';
-            $res = $this->getSpecificLimited("physician_id", $this->physician_id, "createdAt", $limit, $offset);
+            $res = $this->getSpecificLimited("physician_id", $this->physician_id, "addedat", $limit, $offset);
             $count = $this->getOrdersCount()->count;
             // die(var_dump($this->getOrdersCount()->count));
             $this->table = 'examinationOrder';

@@ -89,16 +89,16 @@ class JWTGenerate
         };
         // echo "<br> TOKEN " . $token;
         // die();
-        
         if ($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'GET' || $_SERVER['REQUEST_METHOD'] === 'UPDATE') {
             // if (!preg_match('/Bearer\s(\S+)/', $token, $matches)) {
             //     header('HTTP/1.0 400 Bad Request');
             //     echo 'Token not found in request';
             //     exit;
             // }
-            
+
             // $jwt = $matches[1];
             $jwt = $tokenInCookie;
+            
             if (!$jwt) {
                 // No token was able to be extracted from the authorization header
                 header('HTTP/1.0 400 Bad Request');
@@ -130,9 +130,8 @@ class JWTGenerate
                 $token->nbf > $now->getTimestamp() ||
                 $token->exp < $now->getTimestamp()
             ) {
-                header('HTTP/1.1 401 Unauthorized');
-                // return false;
-                exit;
+                return false;
+                // exit;
             } else {
                 return true;
             }

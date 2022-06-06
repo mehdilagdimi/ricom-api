@@ -88,23 +88,23 @@ class Authenticate extends Controller
 
     public function validate_jwt($role, &$response = [], $echoAuthState = true)
     {
-       
+        //empty response array for every authentication check
+        $response = [];
         $role = strtoupper($role);
+        // die(var_dump($role));
 
         if (JWTGenerate::validate($role)) {
             $response += ["response" => "Successfully authenticated", "role" => $role];
             if ($echoAuthState) {
                 echo json_encode($response);
             }
-            // echo json_encode(["response" => "Successfully authenticated", "role" => $role]);
             return true;
-            // header("location:" . URLROOT . "$this->role/index");
         }else {
+            // die(var_dump($role));
             $response += ["response" => "Failed authentication", "role" => null];
             if ($echoAuthState) {
                 echo json_encode($response);
             }
-            // echo json_encode(["response" => "Failed authentication", "role" => null]);
             return false;
         }
     }

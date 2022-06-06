@@ -37,11 +37,12 @@ class Orders extends Controller
         $offset = intval($currentPage) * intval($limit);
         $auth = new Authenticate();
         $this->response = [];
+        
+        //get orders for physician
         if ($auth->validate_jwt('physician', $this->response, false)) {
             // $data = json_decode(file_get_contents("php://input"));
             list($result, $count) = $this->orderModel->getOrdersByUserID($userID, $limit, $offset);
-            
-            // die(var_dump($result));
+           
 
             if ($result) {
                 $this->response += ["msg" => "Fetched Orders successfully", "data" => $result, "recordsTotal" => $count, "userID" => $userID];
@@ -51,9 +52,28 @@ class Orders extends Controller
             } else {
                 $this->response += ["msg" => "Failed Fetching Orders successfully", "userID" => $userID];
                 echo json_encode($this->response);
+                header('HTTP/1.1 401 Unauthorized');
+                exit;
+            };
+        } 
+        //get orders for head of department
+        else if ($auth->validate_jwt('headofdepart', $this->response, false)) {
+            // die(var_dump("test"));
+            list($result, $count) = $this->orderModel->getOrdersLimited($limit, $offset);
+           
+            if ($result) {
+                $this->response += ["msg" => "Fetched Orders successfully", "data" => $result, "recordsTotal" => $count, "userID" => $userID];
+                // die(var_dump($this->response));
+                echo json_encode($this->response);
+                exit;
+            } else {
+                $this->response += ["msg" => "Failed Fetching Orders successfully", "userID" => $userID];
+                echo json_encode($this->response);
+                header('HTTP/1.1 401 Unauthorized');
                 exit;
             };
         }
+        
     }
 
     public function storeOrder()
