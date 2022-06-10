@@ -1,4 +1,6 @@
 <?php
+// $origins = ['http://localhost:3000', 'http://192.168.100.226:3000'];
+// header("Access-Control-Allow-Origin: $origins ");
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Content-Type: application/json");
 header('Access-Control-Allow-Credentials: true');

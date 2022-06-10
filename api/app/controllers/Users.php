@@ -82,6 +82,18 @@ class Users extends Controller
             echo json_encode(["response" => "No record was found"]);
         }
     }
+
+    public function getRadiologists(){
+        $role = 'RADIOLOGIST';
+        $attrb = 'fname, lname';
+        $data = $this->userModel->getUsersByRole($role, $attrb);
+    
+        if($data){
+            echo json_encode(['response' => 'Records found', "radiologists" => $data]);
+        } else { 
+            echo json_encode(["response" => "No record was found"]);
+        }
+    }
     // public function login()
     // {
     //     $data = json_decode(file_get_contents("php://input"));
