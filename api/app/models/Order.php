@@ -1,6 +1,8 @@
 <?php
     class Order extends Model{
-        public $physician_id;
+        public $user_id;
+        // public $physician_id;
+        // public $radiologist_id;
         public $order;
         public $status;
 
@@ -19,29 +21,47 @@
             $offset = htmlspecialchars($offset);
             $this->table = 'physician_orders';
             $res = $this->getSpecificLimited(null, null, "createdat", $limit, $offset);
-            $count = $this->getOrdersCount()->count;
+            $count = $this->getOrdersCount("TRUE" , "TRUE")->count;
             $this->table = 'examinationOrder';
             return array($res, $count);
         }
     
-        public function getOrdersByUserID($userID, $limit, $offset){
-            $this->physician_id = htmlspecialchars($userID);
+        public function getOrdersByUserID($userID, $limit, $offset, $role){
+            $this->user_id = htmlspecialchars($userID);
             $limit = htmlspecialchars($limit);
             $offset = htmlspecialchars($offset);
+            // $col = htmlspecialchars($col);
             $this->table = 'physician_orders';
-            $res = $this->getSpecificLimited("physician_id", $this->physician_id, "addedat", $limit, $offset);
-            $count = $this->getOrdersCount()->count;
+            if ($role === "PHYSICIAN") {
+                $res = $this->getSpecificLimited("physician_id", $this->user_id, "addedat", $limit, $offset);
+                $count = $this->getOrdersCount("TRUE", "TRUE")->count;
+            } else {
+                $res = $this->getSpecificLimited("radiologist_id", $this->user_id, "addedat", $limit, $offset);
+                $count = $this->getOrdersCount("radiologist_id", $this->user_id)->count;   
+            }
             // die(var_dump($this->getOrdersCount()->count));
             $this->table = 'examinationOrder';
             return array($res, $count);
         }
-        
-        public function getOrdersCount(){
+
+        // public function getOrdersByRadID($userID, $limit, $offset){
+        //     $this->radiologist_id = htmlspecialchars($userID);
+        //     $limit = htmlspecialchars($limit);
+        //     $offset = htmlspecialchars($offset);
+        //     $this->table = 'physician_orders';
+        //     $res = $this->getSpecificLimited("radiologist_id", $this->radiologist_id, "addedat", $limit, $offset);
+        //     $count = $this->getOrdersCount()->count;
+        //     // die(var_dump($this->getOrdersCount()->count));
+        //     $this->table = 'examinationOrder';
+        //     return array($res, $count);
+        // }
+
+        public function getOrdersCount($col, $val){
             // $this->table = 'physician_orders';
-            $this->db->query("SELECT count(*) FROM $this->table");
+            $this->db->query("SELECT count(*) FROM $this->table WHERE $col =:val");
             //much faster query (estimate)
             // $this->db->query("SELECT reltuples AS estimate FROM pg_class WHERE relname = $this->table");
-
+            $this->db->bind(":val", $val);
             $res = $this->db->single();            
             if ($res) {
                 return $res;

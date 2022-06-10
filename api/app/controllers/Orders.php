@@ -33,16 +33,20 @@ class Orders extends Controller
         // $this->orderModel->getOrder($order);
     }
 
-    public function getOrders($userID, $currentPage, $limit)
+    public function getOrders($userID, $currentPage, $limit, $role)
     {
         $offset = intval($currentPage) * intval($limit);
         $auth = new Authenticate();
         $this->response = [];
         
         //get orders for physician
-        if ($auth->validate_jwt('physician', $this->response, false)) {
+        if ($auth->validate_jwt('physician', $this->response, false) || $auth->validate_jwt('radiologist', $this->response, false)) {
             // $data = json_decode(file_get_contents("php://input"));
-            list($result, $count) = $this->orderModel->getOrdersByUserID($userID, $limit, $offset);
+            // if($role === "PHYSICIAN"){
+                list($result, $count) = $this->orderModel->getOrdersByUserID($userID, $limit, $offset, $role);
+            // } else {
+            //     list($result, $count) = $this->orderModel->getOrdersByUserID($userID, $limit, $offset, "radiologist_id");
+            // }
            
 
             if ($result) {
