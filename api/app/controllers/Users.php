@@ -85,7 +85,7 @@ class Users extends Controller
 
     public function getRadiologists(){
         $role = 'RADIOLOGIST';
-        $attrb = 'fname, lname';
+        $attrb = 'id, fname, lname';
         $data = $this->userModel->getUsersByRole($role, $attrb);
     
         if($data){

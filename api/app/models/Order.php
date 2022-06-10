@@ -35,6 +35,7 @@
             $this->table = 'examinationOrder';
             return array($res, $count);
         }
+        
         public function getOrdersCount(){
             // $this->table = 'physician_orders';
             $this->db->query("SELECT count(*) FROM $this->table");
@@ -49,17 +50,28 @@
             }
         }
         
-        public function getSlot($slotID){
-            // $this->slotID =  $slotID;
+        public function getOrderByID($orderID){
 
-            // $this->db->query("SELECT startTime FROM $this->table WHERE slotID=:slotID");
-            // $this->db->bind(":slotID", $this->slotID);
-
-            // $record = $this->db->single();
-            // // echo json_encode($record->starttime);
-            // // return;
-            // return $record->starttime;
+            $this->db->query("SELECT * FROM $this->table WHERE id=:id");
+            $this->db->bind(":id", $orderID);
+            $record = $this->db->single();
+            return $record;
          }
+
+        public function updateOrderRadID($orderID, $radID){
+            $orderID = htmlspecialchars($orderID);
+            $radID = htmlspecialchars($radID);
+
+            $this->db->query("UPDATE $this->table SET radiologist_id = :radID WHERE id=:id");
+            $this->db->bind(":id", $orderID);
+            $this->db->bind(":radID", $radID);       
+            if ($this->db->execute()) {
+                return 1;
+            } else {
+                return -1;
+            }
+         }
+
          public function addOrder($physician_id, $patient_id, $order, $status){
             $this->physician_id = htmlspecialchars($physician_id);
             $this->patient_id = htmlspecialchars($patient_id);
@@ -80,23 +92,6 @@
             }
          }
          
-        public function getSlotID($startTime){
-            // $this->startTime = htmlspecialchars(strip_tags($startTime));
-
-            // $this->db->query("SELECT slotID FROM $this->table WHERE startTime=:startTime");
-            // $this->db->bind(":startTime", $this->startTime);
-
-            // $record = $this->db->single();
-            // return $record->slotid;
-         }
-
-        
-        public function deleteSlot($SlotID){
-            // $this->db->query("DELETE FROM $this->table WHERE SlotID='$SlotID'");
-            // $this->db->execute();
-         }
-        
+       
          
     }
-    
-?>

@@ -1,8 +1,9 @@
-CREATE VIEW physician_orders AS 
-	SELECT ordr.id, ordr.patient_id, ordr.physician_id, u1.fname AS physician_fname, u1.lname AS physician_lname, radiologist_id, u2.fname AS radiologist_fname, u2.lname AS radiologist_lname, ordr.physician_order, ordr.status, ordr.createdat
+CREATE or REPLACE VIEW  physician_orders AS 
+	SELECT ordr.id, ordr.patient_id, ordr.physician_id, u1.fname AS physician_fname, u1.lname AS physician_lname, radiologist_id, u2.fname AS radiologist_fname, u2.lname AS radiologist_lname, ordr.physician_order, ordr.status, TO_CHAR(ordr.createdat, 'YYYY-MM-DD HH24:MI')addedat
 	FROM examinationorder AS ordr
 	LEFT JOIN users AS u1
 	ON ordr.physician_id = u1.id
 	LEFT JOIN users AS u2
-	ON ordr.radiologist_id = u2.id;
+	ON ordr.radiologist_id = u2.id
+	ORDER BY (radiologist_id IS NOT NULL), addedat DESC;
 	

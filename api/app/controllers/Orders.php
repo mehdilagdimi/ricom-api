@@ -11,9 +11,10 @@ class Orders extends Controller
 {
     public $physician_id;
     public $patient_id;
-    public $radiologist;
+    public $radiologist_id;
     public $status;
     private $order;
+    private $order_id;
     public $response;
 
     public function __construct()
@@ -108,6 +109,38 @@ class Orders extends Controller
                 // else if (!$result) {
                 //     echo json_encode(array("msg" => "Order already exists", "email" => $this->email));
                 // }
+            } else {
+                echo json_encode("No data has been received from client");
+            }
+        } else {
+            echo json_encode("Access denied");
+        }
+    }
+
+    public function assignRadiologist()
+    {
+        // echo "hello";
+        $auth = new Authenticate();
+        $this->response = [];
+        //only by head of department
+        if ($auth->validate_jwt('headofdepart', $this->response, false)) {
+            $data = json_decode(file_get_contents("php://input"));
+            // var_dump($data);
+            // die();
+            if ($data) {
+                $this->radiologist_id = $data->radID;
+                $this->order_id= $data->orderID;
+
+                $result = $this->orderModel->updateOrderRadID($this->order_id, $this->radiologist_id);
+                if ($result === 1) {
+
+                    $this->response += ["msg" => "Assigned Radiologist successfully", "order_id" => $this->order_id];
+                    echo json_encode($this->response);
+                } else if ($result === -1) {
+                    $this->response += ["msg" => "Error assigning radiologist", "order_id" => $this->order_id];
+                    echo json_encode($this->response);
+                }
+            
             } else {
                 echo json_encode("No data has been received from client");
             }
