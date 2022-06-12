@@ -16,9 +16,37 @@ class User extends Model
         $this->table = 'users';
     }
 
-    public function getUsers()
+    // public function getUsers()
+    // {
+    //     return $this->getTable();
+    // }
+
+    public function getUsers($userID, $limit, $offset, $role)
     {
-        return $this->getTable();
+        $this->user_id = htmlspecialchars($userID);
+        $limit = htmlspecialchars($limit);
+        $offset = htmlspecialchars($offset);
+        // $col = htmlspecialchars($col);
+        $res = $this->getSpecificLimited(null, null, "createdat", $limit, $offset);
+        $count = $this->getUsersCount()->count;
+        forEach($res as $r){
+            $r->createdat = date("Y-m-d h:m", strtotime($r->createdat));
+            // die(var_dump($res->createdat));
+        }
+        return array($res, $count);
+    }
+
+    public function getUsersCount(){
+        // $this->table = 'physician_orders';
+        $this->db->query("SELECT count(*) FROM $this->table");
+        //much faster query (estimate)
+        // $this->db->query("SELECT reltuples AS estimate FROM pg_class WHERE relname = $this->table");
+        $res = $this->db->single();            
+        if ($res) {
+            return $res;
+        } else {
+            return false;
+        }
     }
 
     public function addUser($fName, $lName, $role, $email, $phone, $bDate = null, $passw)

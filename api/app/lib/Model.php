@@ -26,17 +26,18 @@
 
         public function getSpecificLimited($col, $constraint, $orderBy, $limit, $offset){
             $cnsrt = !is_null($col) ? " WHERE $col = :constrnt " : "";
-            $query = "SELECT * FROM $this->table". $cnsrt . " ORDER BY :ordrby DESC LIMIT :lmt OFFSET :ofst";
+            //ordering by 2 times because of ties (equal dates exist in table) and seems like using binding doesn"t work so solution was to write explicitly column to order by
+            $query = "SELECT * FROM $this->table". $cnsrt . " ORDER BY :ordrby DESC, $orderBy DESC LIMIT :lmt OFFSET :ofst";
             
             // return $query;
             // $this->db->query("SELECT * FROM $this->table WHERE $col = :constrnt  ORDER BY :ordrby DESC LIMIT :lmt OFFSET :ofst");
             $this->db->query($query);
             if(!is_null($col)){
-               ;
                 $this->db->bind(":constrnt",$constraint);
             }
             // $this->db->bind(":constrnt",$constraint);
             $this->db->bind(":ordrby", $orderBy);
+            // $this->db->bind(":ordrby2", $orderBy);
             $this->db->bind(":lmt", $limit);
             $this->db->bind(":ofst", $offset);
             

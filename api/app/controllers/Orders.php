@@ -153,6 +153,37 @@ class Orders extends Controller
         }
     }
 
+    public function changeOrderState()
+    {
+        $auth = new Authenticate();
+        $this->response = [];
+        //
+        if ($auth->validate_jwt('radiologist', $this->response, false)) {
+            $data = json_decode(file_get_contents("php://input"));
+            // var_dump($data);
+            // die();
+            if ($data) {
+                $this->order_id = $data->orderID;
+                $this->status= $data->newState;
+
+                $result = $this->orderModel->updateOrderState($this->order_id, $this->status);
+                if ($result === 1) {
+                    $this->response += ["msg" => "State changed successfully", "order_id" => $this->order_id];
+                    echo json_encode($this->response);
+                } else if ($result === -1) {
+                    $this->response += ["msg" => "Error changing state", "order_id" => $this->order_id];
+                    echo json_encode($this->response);
+                }
+            
+            } else {
+                echo json_encode("No data has been received from client");
+            }
+        } else {
+            echo json_encode("Access denied");
+        }
+    }
+
+
 
     public function deleteOrders()
     {

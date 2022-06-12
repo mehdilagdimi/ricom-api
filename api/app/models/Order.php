@@ -4,6 +4,7 @@
         // public $physician_id;
         // public $radiologist_id;
         public $order;
+        public $order_id;
         public $status;
 
         public function __construct(){
@@ -85,6 +86,20 @@
             $this->db->query("UPDATE $this->table SET radiologist_id = :radID WHERE id=:id");
             $this->db->bind(":id", $orderID);
             $this->db->bind(":radID", $radID);       
+            if ($this->db->execute()) {
+                return 1;
+            } else {
+                return -1;
+            }
+         }
+
+        public function updateOrderState($orderID, $status){
+            $this->orderID = htmlspecialchars($orderID);
+            $this->status = strtoupper(htmlspecialchars($status));
+
+            $this->db->query("UPDATE $this->table SET status = :status WHERE id=:id");
+            $this->db->bind(":id", $this->orderID);
+            $this->db->bind(":status", $this->status);       
             if ($this->db->execute()) {
                 return 1;
             } else {

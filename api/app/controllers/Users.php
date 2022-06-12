@@ -27,15 +27,53 @@ class Users extends Controller
         $this->signup($params);
     }
 
-
-    public function showUsers()
+    public function getUsers($userID, $currentPage, $limit, $role)
     {
+        $offset = intval($currentPage) * intval($limit);
+        // die(var_dump($role));
+        $auth = new Authenticate();
+        $this->response = [];
+
+        //get users for admin
+        if ($auth->validate_jwt('admin', $this->response, false)) {
+
+            list($result, $count) = $this->userModel->getUsers($userID, $limit, $offset, $role);
+
+            if ($result) {
+                $this->response += ["msg" => "Fetched Orders successfully", "data" => $result, "recordsTotal" => $count, "userID" => $userID];
+                // die(var_dump($this->response));
+                echo json_encode($this->response);
+                exit;
+            } else {
+                $this->response += ["msg" => "Failed Fetching Orders successfully", "userID" => $userID];
+                echo json_encode($this->response);
+                header('HTTP/1.1 401 Unauthorized');
+                exit;
+            };
+        }
+        //get orders for head of department
+        else if ($auth->validate_jwt('headofdepart', $this->response, false)) {
+            // die(var_dump("test"));
+            list($result, $count) = $this->orderModel->getOrdersLimited($limit, $offset);
+
+            if ($result) {
+                $this->response += ["msg" => "Fetched Orders successfully", "data" => $result, "recordsTotal" => $count, "userID" => $userID];
+                // die(var_dump($this->response));
+                echo json_encode($this->response);
+                exit;
+            } else {
+                $this->response += ["msg" => "Failed Fetching Orders successfully", "userID" => $userID];
+                echo json_encode($this->response);
+                header('HTTP/1.1 401 Unauthorized');
+                exit;
+            };
+        }
     }
 
     public function signup()
     {
         $auth = new Authenticate();
-       
+
         //Creating new user is done only by admin
         if ($auth->validate_jwt('admin')) {
             $data = json_decode(file_get_contents("php://input"));
@@ -71,26 +109,28 @@ class Users extends Controller
         }
     }
 
-    public function getPatientById(){
+    public function getPatientById()
+    {
         $role = 'PATIENT';
         $attrb = 'id_p';
         $data = $this->userModel->getUsersByRole($role, $attrb);
-    
-        if($data){
+
+        if ($data) {
             echo json_encode(['response' => 'Records found', "patients_id" => $data]);
-        } else { 
+        } else {
             echo json_encode(["response" => "No record was found"]);
         }
     }
 
-    public function getRadiologists(){
+    public function getRadiologists()
+    {
         $role = 'RADIOLOGIST';
         $attrb = 'id, fname, lname';
         $data = $this->userModel->getUsersByRole($role, $attrb);
-    
-        if($data){
+
+        if ($data) {
             echo json_encode(['response' => 'Records found', "radiologists" => $data]);
-        } else { 
+        } else {
             echo json_encode(["response" => "No record was found"]);
         }
     }
@@ -101,9 +141,9 @@ class Users extends Controller
     //         $this->email = $data->email;
     //         $this->passw = $data->passw;
     //         $this->passw = hashFunction('sha256', $this->passw);
-    
+
     //         $user = $this->userModel->getUser($this->email, $this->passw);
-    
+
     //         //validate jwtoken
     //         $auth = new Authenticate();
     //         if ($auth->validate_jwt($user->role)) {
@@ -116,7 +156,7 @@ class Users extends Controller
     //         echo "No data was sent";
     //         exit();
     //     }
-     
+
     // }
 
 
