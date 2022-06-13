@@ -21,7 +21,7 @@
             $limit = htmlspecialchars($limit);
             $offset = htmlspecialchars($offset);
             $this->table = 'physician_orders';
-            $res = $this->getSpecificLimited(null, null, "createdat", $limit, $offset);
+            $res = $this->getSpecificLimited(null, null, "addedat", $limit, $offset);
             $count = $this->getOrdersCount("TRUE" , "TRUE")->count;
             $this->table = 'examinationOrder';
             return array($res, $count);

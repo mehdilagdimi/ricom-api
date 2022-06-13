@@ -76,7 +76,7 @@ class User extends Model
         $this->bDate = htmlspecialchars(strip_tags($bDate));
         $this->passw = htmlspecialchars(strip_tags($passw));
 
-        $archive = true;
+        $archive = false;
 
         //check is user already exists
         // if ($this->getUser($this->email, $this->passw)) {
