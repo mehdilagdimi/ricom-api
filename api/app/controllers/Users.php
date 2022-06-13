@@ -73,9 +73,9 @@ class Users extends Controller
     public function signup()
     {
         $auth = new Authenticate();
-
+        $this->response = [];
         //Creating new user is done only by admin
-        if ($auth->validate_jwt('admin')) {
+        if ($auth->validate_jwt('admin', $this->response, false)) {
             $data = json_decode(file_get_contents("php://input"));
 
             if ($data) {
@@ -95,14 +95,17 @@ class Users extends Controller
                 $result = $this->userModel->addUser($this->fName, $this->lName, $this->role, $this->email, $this->phone, $this->bDate,  $this->passw);
 
                 if ($result === 1) {
-                    echo json_encode(array("msg" => "User added successfully", "email" => $this->email));
+                    $this->response += array("msg" => "User added successfully", "email" => $this->email);
+                    echo json_encode($this->response);
+
                 } else if (!$result) {
-                    echo json_encode(array("msg" => "User already exists", "email" => $this->email));
+                    $this->response += array("msg" => "User already exists", "email" => $this->email);
+                    echo json_encode($this->response);
                 } else if ($result === -1) {
                     echo json_encode(array("msg" => "Error creating user", "email" => $this->email));
                 }
             } else {
-                echo json_encode("No data has been received from frontend");
+                echo json_encode("No data has been received from client");
             }
         } else {
             echo json_encode("Access denied");

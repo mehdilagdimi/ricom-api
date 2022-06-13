@@ -59,18 +59,21 @@ class User extends Model
         $this->bDate = htmlspecialchars(strip_tags($bDate));
         $this->passw = htmlspecialchars(strip_tags($passw));
 
+        $archive = true;
+
         //check is user already exists
-        if ($this->getUser($this->email, $this->passw)) {
+        // if ($this->getUser($this->email, $this->passw)) {
+        if ($this->getUser($this->email)) {
             return false;
         };
 
         if ($bDate !== null) {
             $this->table = "patient";
-            $this->db->query('INSERT INTO ' . $this->table . ' (fName, lName, "role", email, phone, birthDate, passw) VALUES (:fName, :lName, :rle, :email, :phone, :birthDate, :passw)');
+            $this->db->query('INSERT INTO ' . $this->table . ' (fName, lName, "role", email, phone, birthDate, passw, archive) VALUES (:fName, :lName, :rle, :email, :phone, :birthDate, :passw, :archive)');
             $this->db->bind(':birthDate', $this->bDate);
             $this->table = "users";
         } else {
-            $this->db->query('INSERT INTO '  . $this->table . ' (fname, lname, "role", email, phone, passw) VALUES (:fName, :lName, :rle, :email, :phone, :passw)');
+            $this->db->query('INSERT INTO '  . $this->table . ' (fname, lname, "role", email, phone, passw, archive) VALUES (:fName, :lName, :rle, :email, :phone, :passw, :archive)');
         }
 
         // Reserved PSQL keyword inside a single quoted query in PHP : 
@@ -78,7 +81,7 @@ class User extends Model
 
         // // Reserved PSQL keyword inside a single quoted query in PHP :
         //     # In postgreSQL column names are converted to lowercase so case doesn't matter 
-        //     # Though reserved word 'role' is interpreted the way it is written (case sensitive)
+        //     # Though reserved word 'role' is  the way it is written (case sensitive)
         //     # PHP var can't be recognised inside single quotes       
         // $this->db->query('INSERT INTO ' . $this->table . ' (fName, "role") VALUES (:fName, :rle)');
 
@@ -94,6 +97,7 @@ class User extends Model
         $this->db->bind(':phone', $this->phone);
 
         $this->db->bind(':passw', $this->passw);
+        $this->db->bind(':archive', $archive);
 
         // echo "success bind";
         // die();
@@ -105,11 +109,13 @@ class User extends Model
         }
     }
 
-    public function getUser($email, $passw)
+    // public function getUser($email, $passw)
+    public function getUser($email)
     {
-        $this->db->query("SELECT * FROM $this->table WHERE email=:email AND passw =:passw");
+        // $this->db->query("SELECT * FROM $this->table WHERE email=:email AND passw =:passw");
+        $this->db->query("SELECT * FROM $this->table WHERE email=:email");
         $this->db->bind(':email', $email);
-        $this->db->bind(':passw', $passw);
+        // $this->db->bind(':passw', $passw);
         $result = $this->db->single();
         return $result;
     }
