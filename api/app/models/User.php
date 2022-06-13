@@ -2,6 +2,7 @@
 class User extends Model
 {
 
+    public $userID;
     private $email;
     private $role;
     private $fName;
@@ -44,6 +45,22 @@ class User extends Model
         $res = $this->db->single();            
         if ($res) {
             return $res;
+        } else {
+            return false;
+        }
+    }
+
+    public function archiveUser($userID){
+        $this->userID = htmlspecialchars($userID);
+        $archive = true;
+
+        $this->db->query("UPDATE $this->table SET archive = :archive WHERE id = :userID");
+
+        $this->db->bind(':archive', $archive);
+        $this->db->bind(':userID', $this->userID);
+
+        if ($this->db->execute()) {
+            return true;
         } else {
             return false;
         }

@@ -125,6 +125,19 @@ class Users extends Controller
         }
     }
 
+    public function archiveUser($userID)
+    {
+        // $role = 'PATIENT';
+        // $attrb = 'id_p';
+        $res = $this->userModel->archiveUser($userID);
+
+        if ($res) {
+            echo json_encode(['response' => 'User archived successfully', "orderID" => $userID]);
+        } else {
+            echo json_encode(["response" => "Failed to archive user"]);
+        }
+    }
+
     public function getRadiologists()
     {
         $role = 'RADIOLOGIST';
