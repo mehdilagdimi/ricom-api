@@ -14,7 +14,7 @@
             // $this->db->query("SELECT * FROM vols");
             $result = $this->db->resultSet();
             return $result;
-        }git
+        }
 
         // public function getTableOrder($user, $userID, $c, $orderBy){ 
         //     $this->db->query("SELECT * FROM " . $this->table . " WHERE $user=:userRef ORDER BY " . $c . " $orderBy");
