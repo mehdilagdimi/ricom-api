@@ -1,8 +1,6 @@
 <?php
     class Order extends Model{
         public $user_id;
-        // public $physician_id;
-        // public $radiologist_id;
         public $order;
         public $order_id;
         public $status;
