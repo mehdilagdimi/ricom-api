@@ -23,7 +23,7 @@ class Studies extends Controller
         $auth = new Authenticate();
         $this->response = [];
         
-        if ($auth->validate_jwt($auth->validate_jwt('radiologist', $this->response, false))) {
+        if ($auth->validate_jwt('radiologist', $this->response, false)) {
 
             $result = $this->studyModel->setOrderID($orderID);
 
@@ -82,8 +82,8 @@ class Studies extends Controller
         
         if ($auth->validate_jwt('radiologist', $this->response, false)) {
             $data = json_decode(file_get_contents("php://input"));
-            // echo json_encode(var_dump($data->studyData->study));
-            // die();
+            echo json_encode(var_dump($data->studyData->study));
+            die();
             $DIR = 'C:/xampp/htdocs/RICOM api/dicom/';
 
             $file_chunks = explode(';base64,', $data->studyData->study);
@@ -91,7 +91,8 @@ class Studies extends Controller
             $img_type = $file_type[1];
             $base64Img = base64_decode($file_chunks[1]);
 
-            $filePath = $DIR . uniqid() . '.jpg';
+            // $filePath = $DIR . uniqid() . '.jpg';
+            $filePath = $DIR . uniqid() . $img_type;
             file_put_contents($filePath, $base64Img);
             die();
             list($result, $count) = $this->studyModel->getStudyByserieID($serieID);

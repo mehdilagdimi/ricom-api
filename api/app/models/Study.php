@@ -36,7 +36,7 @@
                 // $res = $this->getSpecificLimited("order_id", $orderID, "addedat", $limit, $offset);
             $this->db->query('INSERT INTO '. $this->table. ' (order_id) VALUES (:order_id)');
 
-            $this->db->bind(":order_id", $this->orderID);
+            $this->db->bind(":order_id", $this->order_id);
             
             if ($this->db->execute()) {
                 return 1;
