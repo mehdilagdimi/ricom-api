@@ -30,10 +30,25 @@
         //     $this->table = 'examinationOrder';
         //     return array($res, $count);
         // }
-    
+            
+        public function setOrderID($orderID){
+            $this->order_id = htmlspecialchars($orderID);
+                // $res = $this->getSpecificLimited("order_id", $orderID, "addedat", $limit, $offset);
+            $this->db->query('INSERT INTO '. $this->table. ' (order_id) VALUES (:order_id)');
+
+            $this->db->bind(":order_id", $this->orderID);
+            
+            if ($this->db->execute()) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
+
         public function getStudiesByOrderID($orderID){
             $this->order_id = htmlspecialchars($orderID);
             $this->serie_id = $this->getSpecific("order_id", $orderID, "createdat");
+            
                 // $res = $this->getSpecificLimited("order_id", $orderID, "addedat", $limit, $offset);
                
             $res = $this->sliceModel->getSlicesBySerieID($this->serie_id);
@@ -68,7 +83,7 @@
         // public function getOrderByID($orderID){
 
         //     $this->db->query("SELECT * FROM $this->table WHERE id=:id");
-        //     $this->db->bind(":id", $orderID);
+            // $this->db->bind(":id", $orderID);
         //     $record = $this->db->single();
         //     return $record;
         //  }
