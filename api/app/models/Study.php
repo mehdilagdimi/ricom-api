@@ -45,20 +45,58 @@
             }
         }
 
-        public function getStudiesByOrderID($orderID){
+        public function getSerieID($orderID){
             $this->order_id = htmlspecialchars($orderID);
-            $this->serie_id = $this->getSpecific("order_id", $orderID, "createdat");
+            $this->db->query('SELECT id FROM '. $this->table. ' WHERE order_id=:order_id');
+
+            $this->db->bind(":order_id", $this->order_id);
+            $res = $this->db->single();
+
+            if ($res) {
+                return $res;
+            } else {
+                return false;
+            }
+        }
+
+        public function getStudyBySerieID($serieID){
+            $this->serie_id = htmlspecialchars($serieID);
+            // $this->serie_id = $this->getSpecific("serie_id", $serieID, "createdat");
             
-                // $res = $this->getSpecificLimited("order_id", $orderID, "addedat", $limit, $offset);
+                // $res = $this->getSpecificLimited("serie_id", $serieID, "addedat", $limit, $offset);
                
-            $res = $this->sliceModel->getSlicesBySerieID($this->serie_id);
-            $count = $this->sliceModel->getSlicesCount($res->serie_id)->count;
+            $res = $this->sliceModel->getSlices($this->serie_id);
+            $count = $this->sliceModel->getSlicesCount($this->serie_id)->count;
             
-            // die(var_dump($this->getOrdersCount()->count));
+            // die(var_dump($this->getseriesCount()->count));
             return array($res, $count);
         }
 
-        
+        public function storeStudy($serieID, $serieName){
+            $this->serie_id = htmlspecialchars($serieID);
+            // echo $serieID;
+            // echo $serieName;
+            // die();
+            // $serieI
+            $this->db->query('UPDATE '.$this->table. ' SET name=:name WHERE id =:serieID');
+            
+            $this->db->bind(':serieID', $this->serie_id);
+            $this->db->bind(':name', $serieName);
+
+            if ($this->db->execute()) {
+                return 1;
+            } else {
+                return -1;
+            }
+         }
+         
+         public function getStudyCount($serieID) {
+            $this->serie_id = htmlspecialchars($serieID);
+
+            $count = $this->sliceModel->getSlicesCount($this->serie_id)->count;
+
+            return $count;
+         }
         // public function getStudiesCount($col, $val){
                  
         //     if ($res) {
@@ -68,7 +106,7 @@
         //     }
         // }
         
-        // public function getOrdersByRadID($userID, $limit, $offset){
+        // public function getseriesByRadID($userID, $limit, $offset){
         //     $this->radiologist_id = htmlspecialchars($userID);
         //     $limit = htmlspecialchars($limit);
         //     $offset = htmlspecialchars($offset);
@@ -116,25 +154,6 @@
         //     }
         //  }
 
-        //  public function addOrder($physician_id, $patient_id, $order, $status){
-        //     $this->physician_id = htmlspecialchars($physician_id);
-        //     $this->patient_id = htmlspecialchars($patient_id);
-        //     $this->order = htmlspecialchars($order);
-        //     $this->status = $status;
-
-        //     $this->db->query('INSERT INTO '.$this->table. ' (physician_id, physician_order, status, patient_id) VALUES (:id, :order, :status, :patient_id)');
-            
-        //     $this->db->bind(':id', $this->physician_id);
-        //     $this->db->bind(':patient_id', $this->patient_id);
-        //     $this->db->bind(':order', $this->order);
-        //     $this->db->bind(':status', $this->status);
-
-        //     if ($this->db->execute()) {
-        //         return 1;
-        //     } else {
-        //         return -1;
-        //     }
-        //  }
          
        
          

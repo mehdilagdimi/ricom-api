@@ -18,9 +18,9 @@
         }
 
     
-        public function getSlicesBySerieID($serieID){
-            $this->order_id = htmlspecialchars($serieID);
-            $res = $this->getSpecific("serie_id", $serieID, "name");
+        public function getSlices($serieID){
+            $this->serie_id = htmlspecialchars($serieID);
+            $res = $this->getSpecific("serie_id", $this->serie_id, "name");
 
             if ($res) {
                 return $res;
@@ -38,7 +38,6 @@
             } else {
                 return false;
             }
-
         }
 
         
