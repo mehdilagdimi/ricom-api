@@ -90,6 +90,12 @@
             }
          }
          
+        public function storeSlice($serieID, $sliceName){
+            $this->serie_id = htmlspecialchars($serieID);
+            $res = $this->sliceModel->storeSlices($this->serie_id, $sliceName);     
+            return $res; 
+         }
+         
          public function getStudyCount($serieID) {
             $this->serie_id = htmlspecialchars($serieID);
 

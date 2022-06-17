@@ -81,6 +81,8 @@ class Studies extends Controller
 
     public function getStudy($serieID)
     {
+        // echo $serieID;
+        // die();
         $auth = new Authenticate();
         $this->response = [];
         
@@ -88,14 +90,14 @@ class Studies extends Controller
 
             list($result, $count) = $this->studyModel->getStudyBySerieID($serieID);
             if ($result) {
-                $this->response += ["msg" => "Fetched Study ID successfully", "data" => $result, "recordsTotal" => $count, "serieID" => $serieID];
+                $this->response += ["msg" => "Fetched Study successfully", "data" => $result, "recordsTotal" => $count, "serieID" => $serieID];
                 // die(var_dump($this->response));
                 echo json_encode($this->response);
                 exit;
 
             } else {
 
-                $this->response += ["msg" => "Failed Fetching Study ID", "serieID" => $serieID];
+                $this->response += ["msg" => "Failed Fetching Study", "serieID" => $serieID];
                 echo json_encode($this->response);
                 header('HTTP/1.1 401 Unauthorized');
                 exit;
@@ -136,14 +138,18 @@ class Studies extends Controller
                 
                 file_put_contents($filePath, $base64Img);
 
-                $result = $this->studyModel->storeStudy($serieID, $serieName);
+                $result = $this->studyModel->storeSlice($serieID, $sliceName);
+
                 if (!$result) {
-                    $this->response += ["msg" => "Failed Storing Study : $key ", "data" => $slice];
+                    $this->response += ["msg" => "Failed Storing Slice : $key ", "data" => $slice];
                     echo json_encode($this->response);
                     exit;
                 }
             }
-
+            // echo $s
+            $result = $this->studyModel->storeStudy($serieID, $serieName);
+            // echo $result;
+            // die();
             $count = $this->studyModel->getStudyCount($serieID);
             // die();
             if ($result) {
