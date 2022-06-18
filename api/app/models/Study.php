@@ -21,28 +21,37 @@
             return $this->getTable();
         }
 
-        // public function getOrdersLimited($limit, $offset){
-        //     $limit = htmlspecialchars($limit);
-        //     $offset = htmlspecialchars($offset);
-        //     $this->table = 'physician_orders';
-        //     $res = $this->getSpecificLimited(null, null, "addedat", $limit, $offset);
-        //     $count = $this->getOrdersCount("TRUE" , "TRUE")->count;
-        //     $this->table = 'examinationOrder';
-        //     return array($res, $count);
-        // }
+        public function checkIfStudyExist($orderID) {
+            $this->order_id = htmlspecialchars($orderID);
+            // $res = $this->getSpecificLimited("order_id", $orderID, "addedat", $limit, $offset);
+            $this->db->query('SELECT 1 FROM '. $this->table. ' WHERE order_id=:order_id');
+
+            $this->db->bind(":order_id", $this->order_id);
+            $this->db->execute();
+            if($this->db->rowCount() > 0){
+                return true;
+            } else {
+                return false;
+            }
+
+        }
             
         public function setOrderID($orderID){
             $this->order_id = htmlspecialchars($orderID);
                 // $res = $this->getSpecificLimited("order_id", $orderID, "addedat", $limit, $offset);
-            $this->db->query('INSERT INTO '. $this->table. ' (order_id) VALUES (:order_id)');
-
-            $this->db->bind(":order_id", $this->order_id);
-            
-            if ($this->db->execute()) {
-                return 1;
+            if(!$this->checkIfStudyExist($orderID)){
+                $this->db->query('INSERT INTO '. $this->table. ' (order_id) VALUES (:order_id)');
+                $this->db->bind(":order_id", $this->order_id);
+                
+                if ($this->db->execute()) {
+                    return 1;
+                } else {
+                    return -1;
+                }
             } else {
-                return -1;
+                return 1;
             }
+
         }
 
         public function getSerieID($orderID){

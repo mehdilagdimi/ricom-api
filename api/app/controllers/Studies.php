@@ -115,12 +115,10 @@ class Studies extends Controller
         if ($auth->validate_jwt('radiologist', $this->response, false)) {
             $data = json_decode(file_get_contents("php://input"));
             $this->slices = $data->studyData->study;
-            // echo json_encode(var_dump($data->studyData->study));
-            // die();
             $serieName = 'serie' . $serieID;
 
-            // $DIR = 'C:/xampp/htdocs/RICOM api/dicom/' . $serieName . "/";
-            $DIR = 'C:/xampp/htdocs/RICOM api/api/app/dicom/' . $serieName . "/";
+            $DIR = 'C:/xampp/htdocs/RICOM api/dicom/' . $serieName . "/";
+            
             if(!file_exists($DIR)){
                 mkdir($DIR);
             }
