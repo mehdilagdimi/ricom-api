@@ -81,8 +81,6 @@ class Studies extends Controller
 
     public function getStudy($serieID)
     {
-        // echo $serieID;
-        // die();
         $auth = new Authenticate();
         $this->response = [];
         
@@ -121,7 +119,8 @@ class Studies extends Controller
             // die();
             $serieName = 'serie' . $serieID;
 
-            $DIR = 'C:/xampp/htdocs/RICOM api/dicom/' . $serieName . "/";
+            // $DIR = 'C:/xampp/htdocs/RICOM api/dicom/' . $serieName . "/";
+            $DIR = 'C:/xampp/htdocs/RICOM api/api/app/dicom/' . $serieName . "/";
             if(!file_exists($DIR)){
                 mkdir($DIR);
             }

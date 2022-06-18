@@ -60,16 +60,10 @@
         }
 
         public function getStudyBySerieID($serieID){
-            $this->serie_id = htmlspecialchars($serieID);
-            // $this->serie_id = $this->getSpecific("serie_id", $serieID, "createdat");
-            
-                // $res = $this->getSpecificLimited("serie_id", $serieID, "addedat", $limit, $offset);
-               
-            $res = $this->sliceModel->getSlices($this->serie_id);
+            $this->serie_id = htmlspecialchars($serieID);      
+            $slices = $this->sliceModel->getSlices($this->serie_id);
             $count = $this->sliceModel->getSlicesCount($this->serie_id)->count;
-            
-            // die(var_dump($this->getseriesCount()->count));
-            return array($res, $count);
+            return array($slices, $count);
         }
 
         public function storeStudy($serieID, $serieName){

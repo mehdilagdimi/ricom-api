@@ -5,6 +5,7 @@
         public $modality_id;
         public $patient_id;
         public $order_id;
+        private $slices;
     
         public function __construct(){
             parent::__construct();
@@ -22,8 +23,21 @@
             $this->serie_id = htmlspecialchars($serieID);
             $res = $this->getSpecific("serie_id", $this->serie_id, "name");
 
-            if ($res) {
-                return $res;
+            $path = dirname(dirname(dirname(__DIR__))) . "/dicom/serie" . $serieID;
+            // $dir = new DirectoryIterator($path);
+            $this->slices = [];
+
+            foreach ($res as $imgObj) {
+                // var_dump($path . "/". $imgObj->name);
+                $imgPath = $path . "/". $imgObj->name;
+                $slice = file_get_contents($imgPath);
+                $base64_slice = base64_encode($slice);
+                $imgObj->img = $base64_slice;
+                array_push($this->slices, $imgObj);
+            }
+            // var_dump($this->slices);
+            if ($this->slices) {
+                return $this->slices;
             } else {
                 return false;
             }
@@ -42,7 +56,6 @@
                 return -1;
             }
         }
-
 
         public function getSlicesCount($serieID){
             $this->db->query("SELECT count(*) FROM $this->table WHERE $serieID =:val");
