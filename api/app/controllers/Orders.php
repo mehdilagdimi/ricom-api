@@ -121,6 +121,35 @@ class Orders extends Controller
         }
     }
 
+    public function updateOrder()
+    {
+        $auth = new Authenticate();
+        $this->response = [];
+        //Creating new order only physicians
+        if ($auth->validate_jwt('physician', $this->response, false)) {
+            $data = json_decode(file_get_contents("php://input"));
+            if ($data) {
+                $this->order_id = $data->orderID;
+                $this->patient_id = $data->patientID;
+                $this->order = $data->order;
+
+                $result = $this->orderModel->updateOrder($this->order_id, $this->patient_id, $this->order);
+                if ($result === 1) {
+                    $this->response += ["msg" => "Order updated successfully", "order" => $this->order];
+                    echo json_encode($this->response);
+                } else if ($result === -1) {
+                    $this->response += ["msg" => "Error updating order", "order" => $this->order];
+                    echo json_encode($this->response);
+                }
+               
+            } else {
+                echo json_encode("No data has been received from client");
+            }
+        } else {
+            echo json_encode("Access denied");
+        }
+    }
+
     public function assignRadiologist()
     {
         // echo "hello";

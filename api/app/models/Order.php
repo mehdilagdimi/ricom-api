@@ -113,6 +113,24 @@
                 return -1;
             }
          }
+
+         public function updateOrder($orderID, $patientID, $order){
+            $this->order_id = htmlspecialchars($orderID);
+            $this->patient_id = htmlspecialchars($patientID);
+            $this->order = htmlspecialchars($order);
+
+            $this->db->query('UPDATE '.$this->table. ' SET patient_id=:patientID, physician_order=:physOrder WHERE id =:orderID');
+            
+            $this->db->bind(':orderID', $this->order_id);
+            $this->db->bind(':patientID', $this->patient_id);
+            $this->db->bind(':physOrder', $this->order);
+
+            if ($this->db->execute()) {
+                return 1;
+            } else {
+                return -1;
+            }
+         }
          
        
          
