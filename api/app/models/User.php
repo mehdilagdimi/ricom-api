@@ -137,6 +137,17 @@ class User extends Model
         return $result;
     }
 
+    public function getUserById($userID)
+    {   
+        $this->userID = htmlspecialchars($userID);
+        // $this->db->query("SELECT * FROM $this->table WHERE email=:email AND passw =:passw");
+        $this->db->query("SELECT * FROM $this->table WHERE id=:userID LIMIT 1");
+        $this->db->bind(':userID', $this->userID);
+        // $this->db->bind(':passw', $passw);
+        $result = $this->db->single();
+        return $result;
+    }
+
     public function getUsersByRole($role, $attrb)
     {
         if ($role == 'PATIENT') {

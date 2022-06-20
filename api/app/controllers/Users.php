@@ -125,6 +125,19 @@ class Users extends Controller
         }
     }
 
+    public function getUser($userID)
+    {
+        $data = $this->userModel->getUserById($userID);
+        $data->createdat = date("Y-m-d h:m", strtotime($data->createdat));
+        // echo var_dump($data);
+        // die();
+        if ($data) {
+            echo json_encode(['response' => 'User found', "user" => $data]);
+        } else {
+            echo json_encode(["response" => "User not found", "user_id" => $userID]);
+        }
+    }
+
     public function archiveUser($userID)
     {
         // $role = 'PATIENT';

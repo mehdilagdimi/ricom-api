@@ -24,7 +24,7 @@ class Studies extends Controller
         $auth = new Authenticate();
         $this->response = [];
         
-        if ($auth->validate_jwt('radiologist', $this->response, false)) {
+        if ($auth->validate_jwt('radiologist', $this->response, false) || $auth->validate_jwt('headofdepart', $this->response, false)) {
             
             $result = $this->studyModel->setOrderID($orderID);
             $serieID = $this->studyModel->getSerieID($orderID);
@@ -40,7 +40,6 @@ class Studies extends Controller
 
                 $this->response += ["msg" => "Failed linking Study with Order", "serieID" => $serieID];
                 echo json_encode($this->response);
-                header('HTTP/1.1 401 Unauthorized');
                 exit;
             };
 
@@ -69,7 +68,7 @@ class Studies extends Controller
 
                 $this->response += ["msg" => "Failed Fetching Study ID", "orderID" => $orderID];
                 echo json_encode($this->response);
-                header('HTTP/1.1 401 Unauthorized');
+                // header('HTTP/1.1 401 Unauthorized');
                 exit;
             };
 
@@ -97,7 +96,7 @@ class Studies extends Controller
 
                 $this->response += ["msg" => "Failed Fetching Study", "serieID" => $serieID];
                 echo json_encode($this->response);
-                header('HTTP/1.1 401 Unauthorized');
+                // header('HTTP/1.1 401 Unauthorized');
                 exit;
             };
 

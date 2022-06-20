@@ -43,17 +43,6 @@
             return array($res, $count);
         }
 
-        // public function getOrdersByRadID($userID, $limit, $offset){
-        //     $this->radiologist_id = htmlspecialchars($userID);
-        //     $limit = htmlspecialchars($limit);
-        //     $offset = htmlspecialchars($offset);
-        //     $this->table = 'physician_orders';
-        //     $res = $this->getSpecificLimited("radiologist_id", $this->radiologist_id, "addedat", $limit, $offset);
-        //     $count = $this->getOrdersCount()->count;
-        //     // die(var_dump($this->getOrdersCount()->count));
-        //     $this->table = 'examinationOrder';
-        //     return array($res, $count);
-        // }
 
         public function getOrdersCount($col, $val){
             // $this->table = 'physician_orders';
